@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "Note Taker",
+  "version": "1.0",
+  "description": "A Google Chrome extension to save, edit, and delete notes.",
+  "permissions": ["storage"],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "Note Taker",
+    "default_icon": "logo.png"
+  },
+  "icons": {
+    "16": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
+  }
+}

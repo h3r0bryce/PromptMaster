@@ -1,0 +1,41 @@
+body {
+    width: 500px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #000000;
+    color: #ffffff;
+    transition: background-color 0.3s, color 0.3s;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  
+  #noteText {
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #55555548;
+    padding: 10px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    overflow: hidden; /* Updated line: Remove scroll bar */
+    resize: none; /* Updated line: Remove sizing */
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  
+  #saveButton {
+    margin-top: 10px;
+    background-color: #d3d3d3;
+    color: #000000;
+    border: none;
+    padding: 8px 16px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  /* Rest of the CSS code remains the same */
+  

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Note Taker</title>
+  <link rel="stylesheet" href="popup.css">
+  <style>
+    /* Your existing CSS styles */
+
+    /* Updated CSS styles for the menu button and dropdown */
+    .menuButton {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .menuIcon {
+      display: inline-block;
+      position: relative;
+      width: 16px;
+      height: 16px;
+      background-color: #333;
+    }
+
+    .menuIcon:before,
+    .menuIcon:after {
+      content: "";
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: #fff;
+    }
+
+    .menuIcon:before {
+      top: 0;
+      left: 0;
+    }
+
+    .menuIcon:after {
+      bottom: 0;
+      left: 0;
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      padding: 8px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+
+    .menuButton:hover .dropdown {
+      display: block;
+    }
+
+    /* Updated CSS styles for hiding copy, edit, and delete functions */
+    .menuButton:hover .dropdown button {
+      display: none;
+    }
+  </style>
+  <script src="popup.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var noteText = document.getElementById("noteText");
+      var saveButton = document.getElementById("saveButton");
+      var noteList = document.getElementById("noteList");
+
+      saveButton.addEventListener("click", function() {
+        var note = noteText.value;
+        if (note.trim() !== "") {
+          saveNoteWithTitle(note);
+          noteText.value = "";
+        }
+      });
+
+      // Save note to storage
+      function saveNoteWithTitle(note) {
+        var title = prompt("Enter the title for the note:");
+        if (title !== null && title.trim() !== "") {
+          var noteObject = {
+            title: title,
+            content: note
+          };
+
+          chrome.storage.sync.get({ notes: [] }, function(result) {
+            var notes = result.notes;
+            notes.push(noteObject);
+            chrome.storage.sync.set({ notes: notes }, function() {
+              displayNotes(notes);
+            });
+          });
+        }
+      }
+
+      // Delete note
+      function deleteNote(index) {
+        chrome.storage.sync.get({ notes: [] }, function(result) {
+          var notes = result.notes;
+          if (index >= 0 && index < notes.length) {
+            notes.splice(index, 1);
+            chrome.storage.sync.set({ notes: notes }, function() {
+              displayNotes(notes);
+            });
+          }
+        });
+      }
+
+      // Edit note
+      function editNote(index) {
+        chrome.storage.sync.get({ notes: [] }, function(result) {
+          var notes = result.notes;
+          if (index >= 0 && index < notes.length) {
+            var updatedNote = prompt("Enter the updated note:", notes[index].content);
+            if (updatedNote !== null && updatedNote.trim() !== "") {
+              notes[index].content = updatedNote;
+              chrome.storage.sync.set({ notes: notes }, function() {
+                displayNotes(notes);
+              });
+            }
+          }
+        });
+      }
+
+      // Copy note
+      function copyNote(index) {
+        chrome.storage.sync.get({ notes: [] }, function(result) {
+          var notes = result.notes;
+          if (index >= 0 && index < notes.length) {
+            var noteToCopy = notes[index].content;
+            navigator.clipboard.writeText(noteToCopy)
+              .then(function() {
+                alert("Note copied to clipboard: " + noteToCopy);
+              })
+              .catch(function(error) {
+                console.error("Unable to copy note: ", error);
+              });
+          }
+        });
+      }
+
+      // Display saved notes
+      function displayNotes(notes) {
+        noteList.innerHTML = "";
+        for (var i = 0; i < notes.length; i++) {
+          var li = document.createElement("li");
+          var note = notes[i];
+
+          var title = document.createElement("span");
+          title.textContent = note.title;
+          title.style.fontWeight = "bold";
+          li.appendChild(title);
+
+          var content = document.createElement("span");
+          content.textContent = note.content;
+          li.appendChild(content);
+
+          var actions = document.createElement("div");
+          actions.className = "actions";
+
+          var menuButton = createMenuButton(i);
+          actions.appendChild(menuButton);
+
+          li.appendChild(actions);
+
+          noteList.appendChild(li);
+        }
+      }
+
+      // Helper function to create a menu button
+      function createMenuButton(index) {
+        var menuButton = document.createElement("span");
+        menuButton.className = "menuButton";
+        menuButton.innerHTML = `
+          <span class="menuIcon">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </span>
+          <span class="dropdown">
+            <button onclick="copyNote(${index})">Copy</button>
+            <button onclick="editNote(${index})">Edit</button>
+            <button onclick="deleteNote(${index})">Delete</button>
+          </span>
+        `;
+
+        return menuButton;
+      }
+
+      // Load saved notes on popup open
+      chrome.storage.sync.get({ notes: [] }, function(result) {
+        displayNotes(result.notes);
+      });
+    });
+  </script>
+</head>
+<body>
+  <textarea id="noteText" placeholder="Enter a note..."></textarea>
+  <button id="saveButton">Save Note</button>
+  <ul id="noteList"></ul>
+</body>
+</html>
