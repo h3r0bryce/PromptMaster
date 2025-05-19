@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Prompt Organizer",
+  "version": "1.0",
+  "description": "Save and organize your favorite prompts easily.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon.png"
+  },
+  "permissions": ["storage", "contextMenus"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
